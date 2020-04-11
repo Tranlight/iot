@@ -521,3 +521,12 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+
+
+// Load config of JWT
+$config['jwt_key'] = 'AUTH_SECRET_123';
+
+/*Generated token will expire in 1 minute for sample code
+* Increase this value as per requirement for production
+*/
+$config['token_timeout'] = 5;

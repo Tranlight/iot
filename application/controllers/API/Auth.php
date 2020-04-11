@@ -2,58 +2,58 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-require APPPATH . '/libraries/REST_Controller.php';
 
-/*
- * Changes:
- * 1. This project contains .htaccess file for windows machine.
- *    Please update as per your requirements.
- *    Samples (Win/Linux): http://stackoverflow.com/questions/28525870/removing-index-php-from-url-in-codeigniter-on-mandriva
- *
- * 2. Change 'encryption_key' in application\config\config.php
- *    Link for encryption_key: http://jeffreybarke.net/tools/codeigniter-encryption-key-generator/
- * 
- * 3. Change 'jwt_key' in application\config\jwt.php
- *
- */
-
-class Auth extends REST_Controller
-{
+class Auth extends REST_Controller {
     public function __construct() {
         parent::__construct();
-        // Load these helper to create JWT tokens
-        $this->load->helper(['jwt', 'authorization']); 
-    }
-    /**
-     * URL: http://localhost/CodeIgniter-JWT-Sample/auth/token
-     * Method: GET
-     */
-    public function token_get()
-    {
-        $tokenData = array();
-        $tokenData['id'] = 1; //TODO: Replace with data for token
-        $output['token'] = AUTHORIZATION::generateToken($tokenData);
-        $this->set_response($output, REST_Controller::HTTP_OK);
+        $this->load->helper(['jwt', 'validate']);
     }
 
-    /**
-     * URL: http://localhost/CodeIgniter-JWT-Sample/auth/token
-     * Method: POST
-     * Header Key: Authorization
-     * Value: Auth token generated in GET call
-     */
-    public function token_post()
-    {
-        $headers = $this->input->request_headers();
+    public function login_post() {
+        $this->load->model('user_model', 'user');
+        $this->lang->load('message', 'english');
 
-        if (array_key_exists('Author', $headers) && !empty($headers['Author'])) {
-            $decodedToken = AUTHORIZATION::validateToken($headers['Author']);
-            if ($decodedToken != false) {
-                $this->set_response($decodedToken, REST_Controller::HTTP_OK);
-                return;
+        $username = $this->input->post('username');
+        $password = $this->input->post('password');
+
+        $response = array(
+            'message' => '',
+            'token'   => '',
+        );
+        $code = REST_Controller::HTTP_OK;
+            
+        if(!isset($username) || !isset($password) || empty($username) || empty($password)) {
+            $response['message'] = $this->lang->line('bad_request');
+            $code     = REST_Controller::HTTP_BAD_REQUEST;
+        } else {
+            $username = trim($username);
+            $password = trim($password);
+
+            $user     = $this->user->find_by_username($username);
+            
+            if(!$user) {
+                $response['message'] = $this->lang->line('user_not_exist');
+                $code    = REST_Controller::HTTP_UNAUTHORIZED;
+            } else {
+                $encr_password = md5($password);
+                if($username == $user->username && $encr_password == $user->password) {
+                    $user_id             = $user->id;
+                    $response['message'] = $this->lang->line('login_success');
+                    $token   = time();
+                    $token   = VALIDATE::generateToken($user_id, $response['token']);
+                    if(is_array($token)) {
+                        $response['message'] = $this->lang->line('token_error');
+                        $code                = REST_Controller::HTTP_UNAUTHORIZED;
+                    } else {
+                        $response['token']   = $token;
+                    }
+                } else {
+                    $response['message'] = $this->lang->line('user_invalid');
+                    $code    = REST_Controller::HTTP_UNAUTHORIZED;
+                }
             }
         }
 
-        $this->set_response($headers, REST_Controller::HTTP_UNAUTHORIZED);
+        $this->set_response($response, $code);
     }
 }
