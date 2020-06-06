@@ -16,7 +16,23 @@ class Data_model extends CI_Model {
                 if(!isset($query) || empty($query)) {
                         return null;
                 }
-                return $query;
+                return $query->result();
+        }
+
+        public function get_by_current_hours($hours = null, $interval_minus = 15) {
+                $query = $this->db->query(
+                        "SELECT *
+                        FROM ".$this->table.
+                        " WHERE `date_push` >= DATE_SUB(
+                                (
+                                SELECT date_push
+                                FROM data
+                                ORDER BY `date_push`
+                                DESC LIMIT 1
+                                ),INTERVAL $hours HOUR)         
+                        AND MOD(MINUTE(`date_push`), $interval_minus) = 0"
+                );
+                return $query->result();
         }
 
         public function find_limit($limit, $offset) {
@@ -26,7 +42,7 @@ class Data_model extends CI_Model {
                 if(!isset($query) || empty($query)) {
                         return null;
                 }
-                return $query;
+                return $query->result();
         }
 
         public function insert($statement = array())
