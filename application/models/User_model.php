@@ -16,7 +16,7 @@ class User_model extends CI_Model {
                 if(!isset($query) || empty($query)) {
                         return null;
                 }
-                return $query;
+                return $query->result();
         }
 
         public function find_limit($limit, $offset) {
@@ -26,7 +26,7 @@ class User_model extends CI_Model {
                 if(!isset($query) || empty($query)) {
                         return null;
                 }
-                return $query;
+                return $query->result();
         }
 
         public function create($statement = array())

@@ -24,9 +24,11 @@ class Api extends MY_Controller
             $response['status'] = -1;
             $code = REST_Controller::HTTP_BAD_REQUEST;
         } else {
+            $now = new DateTime();
             $data = array(
-                'key' => $key, 
+                'key'   => $key, 
                 'value' => $value,
+                'date_push'  => $now->format('Y-m-d H:i:s')
             );
             $result = $this->data->insert($data);
             $response['status'] = (int)$result;
