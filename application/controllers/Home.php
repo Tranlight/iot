@@ -15,4 +15,7 @@ class Home extends CI_Controller {
 		unset($data);
 		$this->load->view('chart_message', array('keys' => $keys));
 	}
+	public	function admin() {
+		$this->load->view('admin');
+	}
 }

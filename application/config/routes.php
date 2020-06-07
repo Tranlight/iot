@@ -51,6 +51,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 //For web client
 $route['default_controller'] ='home/chart';
+$route['admin'] ='home/admin';
 
 //For API
 $route['data/push']['POST'] = 'api/api/data';
