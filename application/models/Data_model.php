@@ -1,7 +1,7 @@
 <?php
 
 class Data_model extends CI_Model {
-        private $table = "data";
+        private $table = "reporting_average_minute";
 
         public function __construct()
         {
@@ -21,16 +21,15 @@ class Data_model extends CI_Model {
 
         public function get_by_current_hours($hours = null, $interval_minus = 15) {
                 $query = $this->db->query(
-                        "SELECT *
-                        FROM ".$this->table.
-                        " WHERE `date_push` >= DATE_SUB(
-                                (
-                                SELECT date_push
-                                FROM data
-                                ORDER BY `date_push`
-                                DESC LIMIT 1
-                                ),INTERVAL $hours HOUR)         
-                        AND MOD(MINUTE(`date_push`), $interval_minus) = 0"
+                        "SELECT pin as key, ts as date_push, value FROM ".$this->table. ' LIMIT 100;'
+                        // " WHERE `date_push` >= DATE_SUB(
+                        //         (
+                        //         SELECT date_push
+                        //         FROM ".$this->table."
+                        //         ORDER BY `date_push`
+                        //         DESC LIMIT 1
+                        //         ),INTERVAL $hours HOUR)         
+                        // AND MOD(MINUTE(`date_push`), $interval_minus) = 0"
                 );
                 return $query->result();
         }

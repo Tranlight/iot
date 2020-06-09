@@ -6,10 +6,11 @@ class Home extends CI_Controller {
 	public function chart() {
 		$this->load->model('data_model', 'data');
 		$data = $this->data->get_by_current_hours(24, 60);
+		$mapping = ['0' => 'humidity', '1' => 'temperature', '4' => 'ppm'];
 		$keys = [];
 		foreach ($data as $index => $value) {
 			$date_push = new DateTime($value->date_push);
-			$keys[$value->key][$date_push->format("m-d H:i")] = (float) $value->value;
+			$keys[$mapping[$value->key]][$date_push->format("m-d H:i")] = (float) $value->value;
 		}
 
 		unset($data);
