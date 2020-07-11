@@ -21,7 +21,7 @@ class Data_model extends CI_Model {
 
         public function get_by_current_hours() {
                 $query = $this->db->query(
-                        "SELECT pin as key, ts as date_push, value FROM ".$this->table.';'
+                        "SELECT pin as key, ts as date_push, value FROM ".$this->table.' where pin IN (0,1,4);'
                 );
                 return $query->result();
         }
